@@ -1,0 +1,39 @@
+import * as Phaser from 'phaser';
+import { SCENE_KEYS } from './scenes/scene-keys';
+import { PreloadScene } from './scenes/preload-scene';
+import { GameScene } from './scenes/game-scene';
+import { UiScene } from './scenes/ui-scene';
+import { GameOverScene } from './scenes/game-over-scene';
+import { QuizScene } from './scenes/quiz-scene';
+import { DragDropScene } from './scenes/drag-drop-scene';
+
+const gameConfig: Phaser.Types.Core.GameConfig = {
+  type: Phaser.WEBGL,
+  pixelArt: true,
+  roundPixels: true,
+  scale: {
+    parent: 'game-container',
+    width: 256,
+    height: 224,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
+  },
+  backgroundColor: '#000000',
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0, x: 0 },
+      debug: false,
+    },
+  },
+};
+
+const game = new Phaser.Game(gameConfig);
+
+game.scene.add(SCENE_KEYS.PRELOAD_SCENE, PreloadScene);
+game.scene.add(SCENE_KEYS.GAME_SCENE, GameScene);
+game.scene.add(SCENE_KEYS.UI_SCENE, UiScene);
+game.scene.add(SCENE_KEYS.GAME_OVER_SCENE, GameOverScene);
+game.scene.add(SCENE_KEYS.QUIZ_SCENE, QuizScene);
+game.scene.add(SCENE_KEYS.DRAG_DROP_SCENE, DragDropScene);
+game.scene.start(SCENE_KEYS.PRELOAD_SCENE);

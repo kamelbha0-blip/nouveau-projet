@@ -1,0 +1,71 @@
+[
+  {
+    "id": 5,
+    "type": "drag_drop",
+    "difficulty": "moyen",
+    "timer": 30,
+    "points": 20,
+    "question": "Associe chaque animal à sa catégorie.",
+    "image": "",
+    "audio": "",
+    "dragItems": [{ "id": "lion", "text": "Lion" },{ "id": "vache", "text": "Vache" },{ "id": "requin", "text": "Requin" }],
+    "dropZones": [{ "id": "sauvage", "label": "Animal sauvage" },{ "id": "domestique", "label": "Animal domestique" },{ "id": "marin", "label": "Animal marin" }],
+    "correctMatches": [{ "dragId": "lion", "dropId": "sauvage" },{ "dragId": "vache", "dropId": "domestique" },{ "dragId": "requin", "dropId": "marin" }],
+    "feedbackCorrect": "Excellent ! 🐾",
+    "feedbackWrong": "Réessaie et vérifie les catégories."
+  },
+  {
+    "id": 3,
+    "type": "multiple_choice",
+    "difficulty": "moyen",
+    "timer": 20,
+    "points": 15,
+    "question": "Quel est le plus grand océan du monde ?",
+    "image": "",
+    "audio": "",
+    "options": [
+      {
+        "id": "a",
+        "text": "Océan Atlantique"
+      },
+      {
+        "id": "b",
+        "text": "Océan Pacifique"
+      },
+      {
+        "id": "c",
+        "text": "Océan Indien"
+      }
+    ],
+    "correctAnswer": "b",
+    "feedbackCorrect": "Exact ! 🌊",
+    "feedbackWrong": "La bonne réponse est l'Océan Pacifique."
+  },
+  {
+    "id": 4,
+    "type": "multiple_choice",
+    "difficulty": "moyen",
+    "timer": 20,
+    "points": 15,
+    "question": "Combien font 5 + 7 ?",
+    "image": "",
+    "audio": "",
+    "options": [
+      {
+        "id": "a",
+        "text": "10"
+      },
+      {
+        "id": "b",
+        "text": "12"
+      },
+      {
+        "id": "c",
+        "text": "14"
+      }
+    ],
+    "correctAnswer": "b",
+    "feedbackCorrect": "Bravo !",
+    "feedbackWrong": "5 + 7 = 12."
+  }
+]

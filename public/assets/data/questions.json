@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "question": "Le ciel est-il bleu ?",
+    "answer": true
+  },
+  {
+    "id": 2,
+    "question": "Phaser est un moteur de jeu 3D ?",
+    "answer": false
+  },
+  {
+    "id": 3,
+    "question": "Le joueur peut-il nager ?",
+    "answer": false
+  },
+  {
+    "id": 4,
+    "question": "Zelda est le nom du heros ?",
+    "answer": false
+  },
+  {
+    "id": 5,
+    "question": "Un coffre peut contenir une clé ?",
+    "answer": true
+  }
+]
