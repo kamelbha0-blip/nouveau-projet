@@ -47,7 +47,13 @@ export class OpenChestState extends BaseCharacterState {
           });
         });
       } else {
+<<<<<<< HEAD
         // if answer is wrong, go back to idle state
+=======
+        // wrong answer — lock the chest and notify game-scene to reposition + spawn enemies
+        chest.lockInteraction();
+        EVENT_BUS.emit(CUSTOM_EVENTS.WRONG_ANSWER, chest);
+>>>>>>> e2ec2cf (initial commit)
         this._gameObject.invulnerableComponent.invulnerable = false;
         this._stateMachine.setState(CHARACTER_STATES.IDLE_STATE);
       }

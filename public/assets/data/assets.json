@@ -46,6 +46,19 @@
       },
       {
         "type": "image",
+<<<<<<< HEAD
+=======
+        "key": "UI_DIALOG_QCM",
+        "url": "dialogue qcm.png"
+      },
+      {
+        "type": "image",
+        "key": "UI_DIALOG_TF",
+        "url": "dialogue true false.png"
+      },
+      {
+        "type": "image",
+>>>>>>> e2ec2cf (initial commit)
         "key": "UI_CURSOR",
         "url": "cursor_white.png"
       },

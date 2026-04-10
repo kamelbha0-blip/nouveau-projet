@@ -11,6 +11,10 @@ export const CUSTOM_EVENTS = {
   DIALOG_CLOSED: 'DIALOG_CLOSED',
   BOSS_DEFEATED: 'BOSS_DEFEATED',
   QUIZ_RESULT: 'QUIZ_RESULT',
+<<<<<<< HEAD
+=======
+  WRONG_ANSWER: 'WRONG_ANSWER',
+>>>>>>> e2ec2cf (initial commit)
 } as const;
 
 export const PLAYER_HEALTH_UPDATE_TYPE = {

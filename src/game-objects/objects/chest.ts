@@ -14,6 +14,10 @@ export class Chest extends Phaser.Physics.Arcade.Image implements CustomGameObje
   #id: number;
   #revealTrigger: TrapType;
   #contents: ChestReward;
+<<<<<<< HEAD
+=======
+  #interactionLocked: boolean = false;
+>>>>>>> e2ec2cf (initial commit)
 
   constructor(scene: Phaser.Scene, config: TiledChestObject, chestState = CHEST_STATE.HIDDEN) {
     const frameKey = config.requiresBossKey ? CHEST_FRAME_KEYS.BIG_CHEST_CLOSED : CHEST_FRAME_KEYS.SMALL_CHEST_CLOSED;
@@ -39,6 +43,13 @@ export class Chest extends Phaser.Physics.Arcade.Image implements CustomGameObje
       this,
       INTERACTIVE_OBJECT_TYPE.OPEN,
       () => {
+<<<<<<< HEAD
+=======
+        // blocked while penalty enemies are alive
+        if (this.#interactionLocked) {
+          return false;
+        }
+>>>>>>> e2ec2cf (initial commit)
         // if this is a small chest, then the player can open
         if (!this.#isBossKeyChest) {
           return true;
@@ -117,4 +128,21 @@ export class Chest extends Phaser.Physics.Arcade.Image implements CustomGameObje
     this.#state = CHEST_STATE.REVEALED;
     this.enableObject();
   }
+<<<<<<< HEAD
+=======
+
+  /** Block player interaction (enemies still alive after wrong answer) */
+  public lockInteraction(): void {
+    this.#interactionLocked = true;
+  }
+
+  /** Re-allow player interaction (all enemies defeated) */
+  public unlockInteraction(): void {
+    this.#interactionLocked = false;
+  }
+
+  get isInteractionLocked(): boolean {
+    return this.#interactionLocked;
+  }
+>>>>>>> e2ec2cf (initial commit)
 }

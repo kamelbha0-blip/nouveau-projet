@@ -68,6 +68,11 @@ export class GameScene extends Phaser.Scene {
   #lockedDoorGroup!: Phaser.GameObjects.Group;
   #switchGroup!: Phaser.GameObjects.Group;
   #rewardItem!: Phaser.GameObjects.Image;
+<<<<<<< HEAD
+=======
+  /** Chests locked after a wrong answer, waiting for enemies to be cleared */
+  #penaltyChests: Set<Chest> = new Set();
+>>>>>>> e2ec2cf (initial commit)
 
   constructor() {
     super({
@@ -262,6 +267,10 @@ export class GameScene extends Phaser.Scene {
     EVENT_BUS.on(CUSTOM_EVENTS.PLAYER_DEFEATED, this.#handlePlayerDefeatedEvent, this);
     EVENT_BUS.on(CUSTOM_EVENTS.DIALOG_CLOSED, this.#handleDialogClosed, this);
     EVENT_BUS.on(CUSTOM_EVENTS.BOSS_DEFEATED, this.#handleBossDefeated, this);
+<<<<<<< HEAD
+=======
+    EVENT_BUS.on(CUSTOM_EVENTS.WRONG_ANSWER, this.#handleWrongAnswer, this);
+>>>>>>> e2ec2cf (initial commit)
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       EVENT_BUS.off(CUSTOM_EVENTS.OPENED_CHEST, this.#handleOpenChest, this);
@@ -269,6 +278,10 @@ export class GameScene extends Phaser.Scene {
       EVENT_BUS.off(CUSTOM_EVENTS.PLAYER_DEFEATED, this.#handlePlayerDefeatedEvent, this);
       EVENT_BUS.off(CUSTOM_EVENTS.DIALOG_CLOSED, this.#handleDialogClosed, this);
       EVENT_BUS.off(CUSTOM_EVENTS.BOSS_DEFEATED, this.#handleBossDefeated, this);
+<<<<<<< HEAD
+=======
+      EVENT_BUS.off(CUSTOM_EVENTS.WRONG_ANSWER, this.#handleWrongAnswer, this);
+>>>>>>> e2ec2cf (initial commit)
     });
   }
 
@@ -481,12 +494,100 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
+<<<<<<< HEAD
    * Parses the Tiled Map data and creates the 'Chest' game objects.
    */
   #createChests(map: Phaser.Tilemaps.Tilemap, layerName: string, roomId: number): void {
     const validTiledObjects = getTiledChestObjectsFromMap(map, layerName);
     validTiledObjects.forEach((tiledObject) => {
       const chest = new Chest(this, tiledObject);
+=======
+   * Builds the list of valid tile positions for chest placement in a room.
+   * A tile is valid if it is blue stone floor (B dominant, medium brightness),
+   * not purple/violet, not dark (hole/wall), and at least 1 tile away from the room edge.
+   */
+  #getValidChestTiles(roomId: number): { x: number; y: number }[] {
+    const TILE = 16;
+    const room = this.#objectsByRoomId[roomId].room;
+    const bgTexture = this.textures.get(ASSET_KEYS[`${this.#levelData.level}_BACKGROUND`]);
+    const bgSource = bgTexture.getSourceImage() as HTMLImageElement;
+
+    // Draw the background onto an offscreen canvas to read pixels
+    const canvas = document.createElement('canvas');
+    canvas.width = bgSource.width;
+    canvas.height = bgSource.height;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(bgSource, 0, 0);
+
+    // room.y is bottom edge in Tiled (y increases downward in screen space)
+    const roomLeft = room.x;
+    const roomTop = room.y - room.height;
+    const tilesX = Math.floor(room.width / TILE);
+    const tilesY = Math.floor(room.height / TILE);
+
+    const valid: { x: number; y: number }[] = [];
+
+    for (let ty = 1; ty < tilesY - 1; ty++) {
+      for (let tx = 1; tx < tilesX - 1; tx++) {
+        // Sample center of tile in image space
+        const px = roomLeft + tx * TILE + TILE / 2;
+        const py = roomTop + ty * TILE + TILE / 2;
+
+        if (px < 0 || py < 0 || px >= canvas.width || py >= canvas.height) continue;
+
+        const pixel = ctx.getImageData(px, py, 1, 1).data;
+        const r = pixel[0], g = pixel[1], b = pixel[2];
+        const bright = (r + g + b) / 3;
+
+        // Blue stone floor: B dominant, medium brightness, not purple
+        const isBlue = b > r + 10 && b > g + 5 && bright > 45 && bright < 200;
+        // Purple/violet: R and B both elevated above G
+        const isPurple = r > 70 && b > 70 && r > g + 15 && b > g + 15;
+        // Dark hole/wall
+        const isDark = bright < 35;
+
+        if (isBlue && !isPurple && !isDark) {
+          // World pixel → chest position (origin bottom-left for chest)
+          valid.push({
+            x: roomLeft + tx * TILE,
+            y: roomTop + (ty + 1) * TILE,
+          });
+        }
+      }
+    }
+
+    return valid;
+  }
+
+  /** Pick a random valid tile position for a chest, avoiding occupied spots */
+  #pickRandomChestPosition(
+    roomId: number,
+    occupied: { x: number; y: number }[],
+  ): { x: number; y: number } | null {
+    const TILE = 16;
+    const candidates = this.#getValidChestTiles(roomId).filter(
+      (p) => !occupied.some((o) => Math.abs(o.x - p.x) < TILE * 2 && Math.abs(o.y - p.y) < TILE * 2),
+    );
+    if (candidates.length === 0) return null;
+    return Phaser.Utils.Array.GetRandom(candidates) as { x: number; y: number };
+  }
+
+  /**
+   * Parses the Tiled Map data and creates the 'Chest' game objects.
+   * Positions are randomized on valid blue stone floor tiles only.
+   */
+  #createChests(map: Phaser.Tilemaps.Tilemap, layerName: string, roomId: number): void {
+    const validTiledObjects = getTiledChestObjectsFromMap(map, layerName);
+    const usedPositions: { x: number; y: number }[] = [];
+
+    validTiledObjects.forEach((tiledObject) => {
+      const pos = this.#pickRandomChestPosition(roomId, usedPositions);
+      const rx = pos?.x ?? tiledObject.x;
+      const ry = pos?.y ?? tiledObject.y;
+      if (pos) usedPositions.push(pos);
+
+      const chest = new Chest(this, { ...tiledObject, x: rx, y: ry });
+>>>>>>> e2ec2cf (initial commit)
       this.#objectsByRoomId[roomId].chests.push(chest);
       this.#objectsByRoomId[roomId].chestMap[chest.id] = chest;
       this.#blockingGroup.add(chest);
@@ -706,6 +807,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   #handleAllEnemiesDefeated(): void {
+<<<<<<< HEAD
+=======
+    // unlock any chests that were locked after a wrong answer
+    this.#penaltyChests.forEach((chest) => chest.unlockInteraction());
+    this.#penaltyChests.clear();
+
+>>>>>>> e2ec2cf (initial commit)
     // check to see if any chests, keys, or doors should be revealed/open
     this.#objectsByRoomId[this.#currentRoomId].chests.forEach((chest) => {
       if (chest.revealTrigger === TRAP_TYPE.ENEMIES_DEFEATED) {
@@ -770,6 +878,117 @@ export class GameScene extends Phaser.Scene {
     this.scene.resume();
   }
 
+<<<<<<< HEAD
+=======
+  /** Wrong answer: reposition the chest randomly and spawn enemies around the player */
+  #handleWrongAnswer(chest: Chest): void {
+    this.#penaltyChests.add(chest);
+    // reposition chest to a new random valid position, away from the player
+    const pos = this.#pickRandomChestPosition(this.#currentRoomId, [{ x: this.#player.x, y: this.#player.y }]);
+    if (pos) {
+      chest.setPosition(pos.x, pos.y);
+    }
+    this.#spawnPenaltyEnemiesAroundPlayer();
+  }
+
+  /**
+   * Returns valid floor tile positions for the current room by sampling the background image.
+   * A tile is valid if its center pixel is the cyan-green floor color (~215,246,238),
+   * excluding black walls and purple decorative zones.
+   */
+  #getValidFloorTiles(roomId: number): { x: number; y: number }[] {
+    const TILE = 16;
+    const room = this.#objectsByRoomId[roomId].room;
+    const bgTexture = this.textures.get(ASSET_KEYS[`${this.#levelData.level}_BACKGROUND`]);
+    const bgSource = bgTexture.getSourceImage() as HTMLImageElement;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = bgSource.width;
+    canvas.height = bgSource.height;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(bgSource, 0, 0);
+
+    // In Tiled, room.y is the bottom edge
+    const roomLeft = room.x;
+    const roomTop = room.y - room.height;
+    const tilesX = Math.floor(room.width / TILE);
+    const tilesY = Math.floor(room.height / TILE);
+
+    const valid: { x: number; y: number }[] = [];
+
+    for (let ty = 1; ty < tilesY - 1; ty++) {
+      for (let tx = 1; tx < tilesX - 1; tx++) {
+        const px = roomLeft + tx * TILE + TILE / 2;
+        const py = roomTop + ty * TILE + TILE / 2;
+
+        if (px < 0 || py < 0 || px >= canvas.width || py >= canvas.height) continue;
+
+        const d = ctx.getImageData(px, py, 1, 1).data;
+        const r = d[0], g = d[1], b = d[2];
+
+        // Cyan-green floor: G dominant over R and B, all channels > 150
+        const isFloor = g > r + 10 && g > b + 5 && r > 150 && g > 200 && b > 150;
+        // Purple/violet decorative zone: R and B elevated above G
+        const isPurple = r > 200 && b > 180 && r > g + 15 && b > g + 15;
+
+        if (isFloor && !isPurple) {
+          valid.push({ x: roomLeft + tx * TILE + TILE / 2, y: roomTop + ty * TILE + TILE / 2 });
+        }
+      }
+    }
+
+    return valid;
+  }
+
+  /** Spawn 2 spiders on valid blue floor tiles in the current room, away from the player */
+  #spawnPenaltyEnemiesAroundPlayer(): void {
+    const room = this.#objectsByRoomId[this.#currentRoomId];
+    if (room.enemyGroup === undefined) {
+      room.enemyGroup = this.add.group([], { runChildUpdate: true });
+    }
+
+    const TILE = 16;
+    const MIN_DIST = TILE * 3; // minimum distance from player
+
+    // Get all valid floor tiles, excluding tiles too close to the player
+    const candidates = this.#getValidFloorTiles(this.#currentRoomId).filter(
+      (p) => Math.abs(p.x - this.#player.x) > MIN_DIST || Math.abs(p.y - this.#player.y) > MIN_DIST,
+    );
+
+    // Fallback: if no valid floor tiles found, spawn around player
+    const spawnPositions: { x: number; y: number }[] = [];
+    if (candidates.length === 0) {
+      const offsets = [{ x: -TILE * 3, y: 0 }, { x: TILE * 3, y: 0 }];
+      spawnPositions.push(...offsets.map((o) => ({ x: this.#player.x + o.x, y: this.#player.y + o.y })));
+    } else {
+      Phaser.Utils.Array.Shuffle(candidates);
+      spawnPositions.push(...candidates.slice(0, 2));
+    }
+
+    for (const pos of spawnPositions) {
+      const spider = new Spider({ scene: this, position: { x: pos.x, y: pos.y } });
+      room.enemyGroup.add(spider);
+
+      // make spider visible and active immediately
+      spider.enableObject();
+
+      // collisions with map
+      this.physics.add.collider(spider, this.#collisionLayer);
+      this.physics.add.collider(spider, this.#enemyCollisionLayer);
+
+      // player weapon hits spider
+      this.physics.add.overlap(spider, this.#player.weaponComponent.body, () => {
+        spider.hit(this.#player.direction, this.#player.weaponComponent.weaponDamage);
+      });
+
+      // spider damages player on contact
+      this.physics.add.overlap(this.#player, spider, () => {
+        this.#player.hit(DIRECTION.DOWN, 1);
+      });
+    }
+  }
+
+>>>>>>> e2ec2cf (initial commit)
   #handleBossDefeated(): void {
     DataManager.instance.defeatedCurrentAreaBoss();
     this.#handleAllEnemiesDefeated();
